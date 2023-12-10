@@ -29,5 +29,4 @@ In the digital age, strong passwords are crucial for safeguarding personal infor
 1. Open the application and navigate to "Password Generator Settings."
 2. Customize settings such as password length, character sets, and options.
 3. Click "Generate Password" to create a password meeting the specified criteria.
-4. View the password strength and follow suggestions for improvement.
-5. Export passwords to files for backup or sharing.
+4. Export passwords to files for backup or sharing.
