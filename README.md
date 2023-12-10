@@ -14,8 +14,7 @@ In the digital age, strong passwords are crucial for safeguarding personal infor
 - Option for random password length.
 
 ### Password Management
-- Save generated passwords with associated usernames and categories.
-- View password strength indicators and receive suggestions for improving security.
+- Save generated passwords .
 - Copy passwords to the clipboard for easy use in other applications.
 - Save passwords to text files for future reference.
 
