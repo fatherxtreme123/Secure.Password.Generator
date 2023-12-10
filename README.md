@@ -34,9 +34,4 @@ In the digital age, strong passwords are crucial for safeguarding personal infor
 2. Customize settings such as password length, character sets, and options.
 3. Click "Generate Password" to create a password meeting the specified criteria.
 4. View the password strength and follow suggestions for improvement.
-5. Save the generated password to the manager by providing a username and category.
-6. Explore the "Password History" section to review previously generated passwords.
-7. Use the search box to find specific passwords based on keywords.
-8. Export passwords to files for backup or sharing.
-9. Import passwords from previously saved files.
-10. Explore additional features like the password strength chart and custom rules for advanced password customization.
+5. Export passwords to files for backup or sharing.
