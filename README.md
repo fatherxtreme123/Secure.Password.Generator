@@ -24,8 +24,6 @@ In the digital age, strong passwords are crucial for safeguarding personal infor
 
 ### Additional Functionality
 - Export password history to text files for backup or sharing.
-- Password strength chart and custom password rules for specific security needs.
-- Send feedback to the developer.
 
 ## Quick Start Example
 1. Open the application and navigate to "Password Generator Settings."
