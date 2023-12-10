@@ -18,10 +18,9 @@ In the digital age, strong passwords are crucial for safeguarding personal infor
 - Copy passwords to the clipboard for easy use in other applications.
 - Save passwords to text files for future reference.
 
-### History and Search
+### History
 - View a history of all previously generated passwords.
 - Clear password history for organization.
-- Search for specific passwords using keywords.
 
 ### Additional Functionality
 - Export password history to text files for backup or sharing.
