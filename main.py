@@ -280,6 +280,7 @@ class App(TKMT.ThemedTKinterFrame):
             self.password_display_batch.grid(row=11, column=0, sticky="nsew")
 
             scrollbar = ttk.Scrollbar(self.batch_frame, command=self.password_display_batch.yview)
+            createToolTip(scrollbar, "This is the scrollbar for the password display for batch password generation.")
             scrollbar.grid(row=11, column=1, sticky="ns")
             self.password_display_batch['yscrollcommand'] = scrollbar.set
 
@@ -476,19 +477,16 @@ class App(TKMT.ThemedTKinterFrame):
             self.history_button.config(text="Back to Main Page", command=self.back_to_main_page)
                 
             self.history_display = tk.Text(self.history_frame, state="disabled") 
+            createToolTip(self.history_display, "The password history will be displayed here")
             self.history_display.config(state="normal")
             self.history_display.insert('end', '\n'.join(self.password_history))
             self.history_display.config(state="disabled")
             self.history_display.grid(row=2, column=0, sticky="nsew")
 
             scrollbar = ttk.Scrollbar(self.history_frame, command=self.history_display.yview)
+            createToolTip(scrollbar, "This is the scrollbar for the password history display.")
             scrollbar.grid(row=2, column=1, sticky="ns")
             self.history_display['yscrollcommand'] = scrollbar.set
-
-            self.var_separate = tk.BooleanVar(value=False)
-            self.separate_button = ttk.Button(self.history_frame, text="⮞", command=self.toggle_separate)
-            createToolTip(self.separate_button, "Click to separate or merge the password history.")
-            self.separate_button.grid(row=2, column=2)
 
             self.clear_button = ttk.Button(self.history_frame, text="Clear History", command=self.clear_password_history)
             createToolTip(self.clear_button, "Click to clear the password history.")
@@ -514,63 +512,12 @@ class App(TKMT.ThemedTKinterFrame):
             if hasattr(self, 'history_frame'):
                 self.history_frame.destroy()
 
-            if hasattr(self, 'history_window'):
-                self.history_window.destroy()
-
             if hasattr(self, 'batch_frame'):
                 self.batch_frame.destroy()
 
             self.history_button.config(text="Password History", command=self.show_password_history)
             self.batch_button.config(text="Batch Generate Passwords", command=self.batch_generate_password)
             self.shortcuts_button.config(text="View Shortcuts", command=self.show_shortcuts)
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred: {e}")
-
-    def toggle_separate(self):
-        try:
-            self.var_separate.set(not self.var_separate.get())
-
-            if self.var_separate.get():
-                self.history_window = tk.Toplevel(self.master)
-                self.history_window.title("Password History")
-                self.history_window.resizable(False, False)
-
-                self.history_display_window = tk.Text(self.history_window, state="normal")
-                self.history_display_window.insert('end', '\n'.join(self.password_history))
-                self.history_display_window.config(state="disabled")
-                self.history_display_window.grid()
-
-                scrollbar = ttk.Scrollbar(self.history_window, command=self.history_display_window.yview)
-                scrollbar.grid(row=0, column=1, sticky="ns")
-                self.history_display_window['yscrollcommand'] = scrollbar.set
-
-                self.clear_button_window = ttk.Button(self.history_window, text="Clear History", command=self.clear_password_history)
-                createToolTip(self.clear_button_window, "Click to clear the password history.")
-                self.clear_button_window.grid(pady=10, sticky="ew")
-
-                self.copy_all_button_window = ttk.Button(self.history_window, text="Copy All", command=self.copy_all_history)
-                createToolTip(self.copy_all_button_window, "Click to copy all the password history.")
-                self.copy_all_button_window.grid(pady=10, sticky="ew")
-
-                self.export_button_window = ttk.Button(self.history_window, text="Export Password History", command=self.export_password_history)
-                createToolTip(self.export_button_window, "Click to export password history.")
-                self.export_button_window.grid(pady=10, sticky="ew")
-
-                self.back_button_window = ttk.Button(self.history_window, text="⮜", command=self.back_to_main_page)
-                createToolTip(self.back_button_window, "Click to go back to the main window.")
-                self.back_button_window.grid(row=0, column=2, pady=10)
-
-                self.history_frame.grid_remove()
-
-                self.separate_button.config(text="⮜")
-
-                self.history_window.protocol("WM_DELETE_WINDOW", self.back_to_main_page)
-            else:
-                self.history_window.destroy()
-
-                self.history_frame.grid()
-
-                self.separate_button.config(text="⮞")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
 
@@ -582,11 +529,6 @@ class App(TKMT.ThemedTKinterFrame):
                     self.history_display.config(state="normal")
                     self.history_display.delete('1.0', 'end')
                     self.history_display.config(state="disabled")
-
-                if self.var_separate.get() and self.history_display_window is not None:
-                    self.history_display_window.config(state="normal")
-                    self.history_display_window.delete('1.0', 'end')
-                    self.history_display_window.config(state="disabled")
 
                 with open(self.password_history_file, 'w') as f:
                     json.dump(self.password_history, f)
