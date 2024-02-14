@@ -176,7 +176,7 @@ class App(ctk.CTk):
                     "length": 8, "random_length": True
                 },
             }
-            self.template_var = tk.StringVar()
+            self.template_var = tk.StringVar(value="Template 1")
             self.template_menu = ctk.CTkOptionMenu(self.right_frame, variable=self.template_var, values=list(self.templates.keys()), command=self.apply_template)
             createToolTip(self.template_menu, "Select a template to apply to the password generation settings.")
             self.template_menu.grid(row=10, column=1, pady=10, sticky="ew")
@@ -499,6 +499,9 @@ class App(ctk.CTk):
         try:
             self.right_frame.grid()
 
+            if hasattr(self, 'shortcuts_frame'):
+                self.shortcuts_frame.destroy()
+
             if hasattr(self, 'history_frame'):
                 self.history_frame.destroy()
 
@@ -507,6 +510,7 @@ class App(ctk.CTk):
 
             self.history_button.configure(text="Password History", command=self.show_password_history)
             self.batch_button.configure(text="Batch Generate Passwords", command=self.batch_generate_password)
+            self.shortcuts_button.configure(text="View Shortcuts", command=self.show_shortcuts)
         except Exception as e:
             CTkMessagebox(title="Error", message=f"An error occurred: {e}")
 
