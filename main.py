@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
+from CTkListbox import *
 import tkinter as tk
 import string
 import random
@@ -353,8 +354,7 @@ class App(ctk.CTk):
             createToolTip(self.generate_button_batch, "Click here to generate passwords.")
             self.generate_button_batch.grid(row=10, column=0,sticky="ew", pady=10, padx=10)
 
-            self.password_display_batch = ctk.CTkTextbox(self.batch_frame, state="disabled", width=550, height=420)
-            createToolTip(self.password_display_batch, "The generated passwords will be displayed here")
+            self.password_display_batch = CTkListbox(self.batch_frame, width=200, height=200)
             self.password_display_batch.grid(row=11, column=0, sticky="nsew")
 
             self.copy_all_button_batch = ctk.CTkButton(self.batch_frame, text="Copy All", command=self.copy_all_passwords_batch)
@@ -395,7 +395,6 @@ class App(ctk.CTk):
 
     def generate_passwords_batch(self):
         try:
-            length = random.randint(1, self.var_length_batch.get()) if self.var_random_length_batch.get() else self.var_length_batch.get()
             quantity = self.var_quantity_batch.get()
             characters = ""
             if self.var_upper_batch.get():
@@ -412,17 +411,21 @@ class App(ctk.CTk):
             passwords = []
             if characters:
                 for _ in range(quantity):
+                    if self.var_random_length_batch.get():
+                        length = random.randint(1, self.var_length_batch.get())
+                    else:
+                        length = self.var_length_batch.get()
                     password = "".join(random.choice(characters) for _ in range(length))
                     passwords.append(password)
             else:
                 CTkMessagebox(title="Info", message="No characters available for password generation. Please check the settings.")
 
-            self.password_display_batch.configure(state='normal')
-            self.password_display_batch.delete('1.0', 'end')
-            self.password_display_batch.insert('end', '\n'.join(passwords))
-            self.password_display_batch.configure(state='disabled')
+            self.password_display_batch.delete(0, 'end')
+            for password in passwords:
+                self.password_display_batch.insert('end', password)
 
             self.password_history.extend(passwords)
+            self.password_history = self.password_history[-100:]
 
             with open(self.password_history_file, 'w') as f:
                 json.dump(self.password_history, f)
@@ -432,14 +435,20 @@ class App(ctk.CTk):
 
     def copy_all_passwords_batch(self):
         try:
+            if self.password_display_batch.size() == 0:
+                CTkMessagebox(title="Info", message="Please generate or enter some passwords first.")
+                return
+            
+            passwords = [self.password_display_batch.get(i) for i in range(self.password_display_batch.size())]
+            
+            passwords_str = '\n'.join(passwords)
+            
             root = self.winfo_toplevel()
             root.clipboard_clear()
-            if self.password_display_batch.get('1.0', 'end').strip():
-                root.clipboard_append(self.password_display_batch.get('1.0', 'end'))
-                root.update()
-                CTkMessagebox(title="Success", message="Passwords copied to clipboard.")
-            else:
-                CTkMessagebox(title="Info", message="Please generate or enter some passwords first.")
+            root.clipboard_append(passwords_str)
+            root.update()
+            
+            CTkMessagebox(title="Success", message="Passwords copied to clipboard.")
         except Exception as e:
             CTkMessagebox(title="Error", message=f"An error occurred: {e}")
 
@@ -474,11 +483,10 @@ class App(ctk.CTk):
 
             self.history_button.configure(text="Back to Main Page", command=self.back_to_main_page)
                 
-            self.history_display = ctk.CTkTextbox(self.history_frame, state="disabled", width=550, height=420) 
+            self.history_display = CTkListbox(self.history_frame, width=550, height=420) 
             createToolTip(self.history_display, "The password history will be displayed here")
-            self.history_display.configure(state="normal")
-            self.history_display.insert('end', '\n'.join(self.password_history))
-            self.history_display.configure(state="disabled")
+            for password in self.password_history[-100:]:
+                self.history_display.insert('end', password)
             self.history_display.grid(row=2, column=0, sticky="nsew")
 
             self.clear_button = ctk.CTkButton(self.history_frame, text="Clear History", command=self.clear_password_history)
@@ -516,19 +524,19 @@ class App(ctk.CTk):
 
     def clear_password_history(self):
         try:
-            if self.password_history:
-                self.password_history = []
-                if self.history_display is not None:
-                    self.history_display.configure(state="normal")
-                    self.history_display.delete('1.0', 'end')
-                    self.history_display.configure(state="disabled")
-
-                with open(self.password_history_file, 'w') as f:
-                    json.dump(self.password_history, f)
-
-                CTkMessagebox(title="Clear History", message="Password history has been cleared.")
-            else:
+            if not self.password_history:
                 CTkMessagebox(title="Info", message="Password history is already empty.")
+                return
+
+            self.password_history.clear()
+
+            with open(self.password_history_file, 'w') as f:
+                json.dump(self.password_history, f)
+
+            if self.history_display is not None:
+                self.history_display.delete(0, 'end')
+
+            CTkMessagebox(title="Clear History", message="Password history has been cleared.")
         except Exception as e:
             CTkMessagebox(title="Error", message=f"An error occurred: {e}")
 
