@@ -10,6 +10,7 @@ import os
 import json
 import pyperclip
 import webbrowser
+import threading
 
 def createToolTip(widget, text):
     try:
@@ -357,9 +358,34 @@ class App(ctk.CTk):
             self.password_display_batch = CTkListbox(self.batch_frame, width=200, height=200)
             self.password_display_batch.grid(row=11, column=0, sticky="nsew")
 
+            self.clear_all_button_batch = ctk.CTkButton(self.batch_frame, text="Clear All", command=self.clear_all_passwords_batch)
+            createToolTip(self.clear_all_button_batch, "Click to clear all the generated passwords")
+            self.clear_all_button_batch.grid(row=12, column=0, sticky="ew", pady=10)
+
             self.copy_all_button_batch = ctk.CTkButton(self.batch_frame, text="Copy All", command=self.copy_all_passwords_batch)
             createToolTip(self.copy_all_button_batch, "Click to copy all the generated passwords")
-            self.copy_all_button_batch.grid(row=12, column=0, sticky="ew", pady=10)
+            self.copy_all_button_batch.grid(row=13, column=0, sticky="ew", pady=10)
+
+            self.export_all_button_batch = ctk.CTkButton(self.batch_frame, text="Export All", command=self.export_all_passwords_batch)
+            createToolTip(self.export_all_button_batch, "Click to export all the generated passwords")
+            self.export_all_button_batch.grid(row=14, column=0, sticky="ew", pady=10)
+        except Exception as e:
+            CTkMessagebox(title="Error", message=f"An error occurred: {e}")
+
+    def clear_all_passwords_batch(self):
+        try:
+            self.password_display_batch.delete(0, 'end')
+        except Exception as e:
+            CTkMessagebox(title="Error", message=f"An error occurred: {e}")
+
+    def export_all_passwords_batch(self):
+        try:
+            if self.password_display_batch.size() > 0:
+                filename = filedialog.asksaveasfilename(defaultextension=".txt", initialfile="batch_passwords.txt")
+                if filename:
+                    with open(filename, 'w') as f:
+                        for i in range(self.password_display_batch.size()):
+                            f.write(self.password_display_batch.get(i) + "\n")
         except Exception as e:
             CTkMessagebox(title="Error", message=f"An error occurred: {e}")
 
@@ -417,12 +443,9 @@ class App(ctk.CTk):
                         length = self.var_length_batch.get()
                     password = "".join(random.choice(characters) for _ in range(length))
                     passwords.append(password)
+                    self.after(10, self.add_password_to_listbox, password)
             else:
                 CTkMessagebox(title="Info", message="No characters available for password generation. Please check the settings.")
-
-            self.password_display_batch.delete(0, 'end')
-            for password in passwords:
-                self.password_display_batch.insert('end', password)
 
             self.password_history.extend(passwords)
             self.password_history = self.password_history[-100:]
@@ -432,6 +455,9 @@ class App(ctk.CTk):
 
         except Exception as e:
             CTkMessagebox(title="Error", message=f"An error occurred: {e}")
+
+    def add_password_to_listbox(self, password):
+        self.password_display_batch.insert('end', password)
 
     def copy_all_passwords_batch(self):
         try:
@@ -485,8 +511,6 @@ class App(ctk.CTk):
                 
             self.history_display = CTkListbox(self.history_frame, width=550, height=420) 
             createToolTip(self.history_display, "The password history will be displayed here")
-            for password in self.password_history[-100:]:
-                self.history_display.insert('end', password)
             self.history_display.grid(row=2, column=0, sticky="nsew")
 
             self.clear_button = ctk.CTkButton(self.history_frame, text="Clear History", command=self.clear_password_history)
@@ -500,6 +524,16 @@ class App(ctk.CTk):
             self.export_button = ctk.CTkButton(self.history_frame, text="Export Password History", command=self.export_password_history)
             createToolTip(self.export_button, "Click to export password history.")
             self.export_button.grid(row=5, column=0, pady=10, sticky="ew")
+
+            t = threading.Thread(target=self.load_password_history)
+            t.start()
+        except Exception as e:
+            CTkMessagebox(title="Error", message=f"An error occurred: {e}")
+
+    def load_password_history(self):
+        try:
+            for password in self.password_history[-100:]:
+                self.history_display.insert('end', password)
         except Exception as e:
             CTkMessagebox(title="Error", message=f"An error occurred: {e}")
 
